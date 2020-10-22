@@ -49,7 +49,7 @@ function viewRecords() {
             choices: [
                 "Departments",
                 "Manager",
-                "Jobs",
+                "Roles",
                 "Employees",
                 "Return to Menu"
             ]
@@ -62,8 +62,8 @@ function viewRecords() {
                 case "Manager":
                     findManager();
                     break;
-                case "Jobs":
-                    findJob();
+                case "Roles":
+                    findrole();
                     break;
 
                 case "Employees":
@@ -87,7 +87,7 @@ function viewBudget() {
 
     .then(function(answer) {
 
-        connection.query("SELECT department.name, department_id, SUM (job.salary) AS budget FROM job INNER JOIN employee INNER JOIN department ON job.id = employee.job_id AND department.id = job.department_id WHERE job.department_id = ?  GROUP BY department_id", [answer.departmentNum],
+        connection.query("SELECT department.name, department_id, SUM (role.salary) AS budget FROM role INNER JOIN employee INNER JOIN department ON role.id = employee.role_id AND department.id = role.department_id WHERE role.department_id = ?  GROUP BY department_id", [answer.departmentNum],
             function(err, res) {
                 if (err) throw err;
                 console.table(res)
@@ -104,7 +104,7 @@ function addRecord() {
             message: "What kind of record do you want to add?",
             choices: [
                 "Departments",
-                "Jobs",
+                "Roles",
                 "Employees",
                 "Return to Menu"
             ]
@@ -115,8 +115,8 @@ function addRecord() {
                     addDepartment();
                     break;
 
-                case "Jobs":
-                    addJob();
+                case "Roles":
+                    addrole();
                     break;
 
                 case "Employees":
@@ -138,7 +138,7 @@ function deleteRecord() {
             message: "What kind of record do you want to delete?",
             choices: [
                 "Departments",
-                "Jobs",
+                "Roles",
                 "Employees",
                 "Manager",
                 "Return to Menu"
@@ -152,8 +152,8 @@ function deleteRecord() {
                 case "Manager":
                     deleteManager();
                     break;
-                case "Jobs":
-                    deleteJob();
+                case "Roles":
+                    deleterole();
                     break;
 
                 case "Employees":
@@ -195,16 +195,16 @@ function updateEmployee() {
                 message: "Enter the ID of the employee whose role you want to update",
             },
             {
-                name: "jobID",
+                name: "roleID",
                 type: "number",
-                message: "Enter the Job ID number",
+                message: "Enter the role ID number",
             },
         ])
         .then(function(answer) {
-            connection.query("UPDATE employee SET ? WHERE ?", [{ job_id: answer.jobID }, { id: answer.id }],
+            connection.query("UPDATE employee SET ? WHERE ?", [{ role_id: answer.roleID }, { id: answer.id }],
                 function(err, res) {
                     if (err) throw err;
-                    console.log(`Employee ID ${answer.id} updated with Job ID ${answer.jobID}`)
+                    console.log(`Employee ID ${answer.id} updated with role ID ${answer.roleID}`)
                     init();
                 }
             )
@@ -227,8 +227,8 @@ function findManager() {
     })
 }
 
-function findJob() {
-    connection.query("SELECT job.id, title, salary, name FROM job INNER JOIN department ON department_id = department.id;", function(err, res) {
+function findrole() {
+    connection.query("SELECT role.id, title, salary, name FROM role INNER JOIN department ON department_id = department.id;", function(err, res) {
         if (err) throw err;
         console.table(res);
         init();
@@ -237,7 +237,7 @@ function findJob() {
 
 function findEmployee() {
     console.log("running findEmployee()")
-    connection.query("SELECT employee.id, manager_id, first_name, last_name, title, salary FROM employee INNER JOIN job ON employee.job_id = job.id;", function(err, res) {
+    connection.query("SELECT employee.id, manager_id, first_name, last_name, title, salary FROM employee INNER JOIN role ON employee.role_id = role.id;", function(err, res) {
         if (err) throw err;
         console.table(res);
         init();
@@ -278,11 +278,11 @@ function deleteDepartment() {
         });
 }
 
-function addJob() {
+function addrole() {
     inquirer.prompt([{
                 name: "title",
                 type: "input",
-                message: "Enter the title of the job you want to add:",
+                message: "Enter the title of the role you want to add:",
             },
             {
                 name: "salary",
@@ -297,32 +297,32 @@ function addJob() {
         ])
         .then(function(answer) {
             console.log(answer)
-            connection.query("INSERT INTO job SET ?", {
+            connection.query("INSERT INTO role SET ?", {
                     title: answer.title,
                     salary: answer.salary,
                     department_id: answer.departmentID
                 },
                 function(err, res) {
                     if (err) throw err;
-                    console.log(`Job ${answer.title} with salary ${answer.salary} in department ${answer.departmentID} added!`)
+                    console.log(`role ${answer.title} with salary ${answer.salary} in department ${answer.departmentID} added!`)
                     init();
                 }
             )
         });
 }
 
-function deleteJob() {
+function deleterole() {
     inquirer.prompt([{
             name: "title",
             type: "input",
-            message: "Enter the title of the job you want to delete:",
+            message: "Enter the title of the role you want to delete:",
         }, ])
         .then(function(answer) {
             console.log(answer)
-            connection.query("DELETE FROM job WHERE job.title =? ", [answer.title],
+            connection.query("DELETE FROM role WHERE role.title =? ", [answer.title],
                 function(err, res) {
                     if (err) throw err;
-                    console.log(`Job ${answer.title} `)
+                    console.log(`role ${answer.title} `)
                     init();
                 }
             )
@@ -359,9 +359,9 @@ function addEmployee() {
                 message: "Enter the first last of the new employee:",
             },
             {
-                name: "jobID",
+                name: "roleID",
                 type: "number",
-                message: "Enter a number for the Job ID:",
+                message: "Enter a number for the role ID:",
             },
             {
                 name: "managerID",
@@ -374,13 +374,13 @@ function addEmployee() {
             connection.query("INSERT INTO employee SET ?", {
                     first_name: answer.firstName,
                     last_name: answer.lastName,
-                    job_id: answer.jobID,
+                    role_id: answer.roleID,
                     manager_id: answer.managerID
                 },
                 function(err, res) {
                     if (err) throw err;
 
-                    console.log(`New employee: ${answer.firstName} ${answer.lastName} with Job ID ${answer.jobID} and Manager with an ID of ${answer.managerID}`)
+                    console.log(`New employee: ${answer.firstName} ${answer.lastName} with role ID ${answer.roleID} and Manager with an ID of ${answer.managerID}`)
                     init();
                 }
             )
@@ -402,7 +402,7 @@ function deleteEmployee() {
         ])
         .then(function(answer) {
             console.log(answer)
-                // console.log(`The employee deleted: ${answer.firstName} ${answer.lastName} with Job ID ${answer.jobID} and Manager with an ID of ${answer.managerID}`)
+                // console.log(`The employee deleted: ${answer.firstName} ${answer.lastName} with role ID ${answer.roleID} and Manager with an ID of ${answer.managerID}`)
             connection.query("DELETE FROM employee WHERE first_name = ? AND last_name = ? ", [answer.firstName, answer.lastName],
 
                 function(err, res) {
