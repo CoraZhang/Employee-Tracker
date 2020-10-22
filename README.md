@@ -48,8 +48,9 @@ Here are some guidelines:
 
 * Link: 
 
-## Screenshots
-
+## Screenshots from command line
+* ![alt text](Assets/Command1.png)
+* ![alt text](Assets/Command2.png)
 
 ### Hints
 
