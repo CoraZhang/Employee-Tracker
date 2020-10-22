@@ -11,7 +11,7 @@ function init() {
                 "Add a record",
                 "View Records",
                 "Update Employee Roles",
-                // "Delete Records"
+                "Delete Records"
             ]
         })
         .then(function(answer) {
@@ -28,9 +28,9 @@ function init() {
                     updateEmployee();
                     break;
 
-                    //  case "Delete Records ":
-                    // deleteRecord();
-                    //break;
+                case "Delete Records":
+                    deleteRecord();
+                    break;
             }
         })
 }
@@ -102,7 +102,7 @@ function addRecord() {
             }
         });
 }
-/*
+
 function deleteRecord() {
     inquirer
         .prompt({
@@ -116,7 +116,7 @@ function deleteRecord() {
                 "Return to Menu"
             ]
         })
-        .then(function (answer) {
+        .then(function(answer) {
             switch (answer.action) {
                 case "Departments":
                     deleteDepartment();
@@ -136,7 +136,7 @@ function deleteRecord() {
             }
         });
 }
-*/
+
 function updateEmployee() {
     inquirer.prompt([{
                 name: "id",
@@ -201,15 +201,15 @@ function addDepartment() {
             )
         });
 }
-/*
+
 function deleteDepartment() {
     inquirer.prompt([{
             name: "departmentID",
             type: "input",
-            message: "Enter the name of the department you want to delete:",
+            message: "Enter the id of the department you want to delete:",
         }])
         .then(function(answer) {
-            connection.query("DELETE FROM department WHERE department.id = answer.departmentID") ,
+            connection.query("DELETE FROM department WHERE department.id = ?", [answer.departmentID],
                 function(err, res) {
                     if (err) throw err;
                     console.log(`Department ${answer.departmentID} successfully deleted!`)
@@ -218,7 +218,7 @@ function deleteDepartment() {
             )
         });
 }
-*/
+
 function addJob() {
     inquirer.prompt([{
                 name: "title",
@@ -251,27 +251,24 @@ function addJob() {
             )
         });
 }
-/*
+
 function deleteJob() {
     inquirer.prompt([{
-                name: "title",
-                type: "input",
-                message: "Enter the title of the job you want to delete:",
-            },
-        ])
+            name: "title",
+            type: "input",
+            message: "Enter the title of the job you want to delete:",
+        }, ])
         .then(function(answer) {
             console.log(answer)
-            connection.query("DELETE FROM job WHERE job.title = answer.title"), 
+            connection.query("DELETE FROM job WHERE job.title =? ", [answer.title],
                 function(err, res) {
                     if (err) throw err;
-                    console.log(`Job ${answer.title} with salary ${answer.salary} in department ${answer.departmentID} deleted!`)
+                    console.log(`Job ${answer.title} `)
                     init();
                 }
             )
         });
 }
-
-*/
 
 function addEmployee() {
     inquirer.prompt([{
@@ -311,9 +308,9 @@ function addEmployee() {
             )
         });
 }
-/*
 
-function addEmployee() {
+
+function deleteEmployee() {
     inquirer.prompt([{
                 name: "firstName",
                 type: "input",
@@ -327,21 +324,22 @@ function addEmployee() {
         ])
         .then(function(answer) {
             console.log(answer)
-            connection.query("DELETE FROM employee WHERE employee.first_name = answer.firstName AND employee.last_name = answer.lastName "), 
-              
+                // console.log(`The employee deleted: ${answer.firstName} ${answer.lastName} with Job ID ${answer.jobID} and Manager with an ID of ${answer.managerID}`)
+            connection.query("DELETE FROM employee WHERE first_name = ? AND last_name = ? ", [answer.firstName, answer.lastName],
+
                 function(err, res) {
                     if (err) throw err;
-                    console.log(`The employee deleted: ${answer.firstName} ${answer.lastName} with Job ID ${answer.jobID} and Manager with an ID of ${answer.managerID}`)
+                    console.log(`The employee deleted: ${answer.firstName} ${answer.lastName}`)
                     init();
-                }
-            )
+                })
+
         });
 }
-*/
+
 module.exports = {
     init,
     viewRecords,
     addRecord,
     updateEmployee,
-    //deleteRecord
+    deleteRecord,
 }
