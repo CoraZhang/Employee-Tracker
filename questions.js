@@ -12,7 +12,8 @@ function init() {
                 "View Records",
                 "Update Employee Roles",
                 "Delete Records",
-                "Update Employee Managers"
+                "Update Employee Managers",
+                "View Department Budget"
             ]
         })
         .then(function(answer) {
@@ -20,11 +21,12 @@ function init() {
                 case "Add a record":
                     addRecord();
                     break;
-
+                case "View Department Budget":
+                    viewBudget();
+                    break;
                 case "View Records":
                     viewRecords();
                     break;
-
                 case "Update Employee Roles":
                     updateEmployee();
                     break;
@@ -75,6 +77,25 @@ function viewRecords() {
         });
 }
 
+function viewBudget() {
+    inquirer
+        .prompt({
+            name: "departmentNum",
+            type: "input",
+            message: "Which department do you want to view total budget?",
+        })
+
+    .then(function(answer) {
+
+        connection.query("SELECT department.name, department_id, SUM (job.salary) AS budget FROM job INNER JOIN employee INNER JOIN department ON job.id = employee.job_id AND department.id = job.department_id WHERE job.department_id = ?  GROUP BY department_id", [answer.departmentNum],
+            function(err, res) {
+                if (err) throw err;
+                console.table(res)
+                init();
+            })
+    })
+}
+
 function addRecord() {
     inquirer
         .prompt({
@@ -119,6 +140,7 @@ function deleteRecord() {
                 "Departments",
                 "Jobs",
                 "Employees",
+                "Manager",
                 "Return to Menu"
             ]
         })
@@ -127,7 +149,9 @@ function deleteRecord() {
                 case "Departments":
                     deleteDepartment();
                     break;
-
+                case "Manager":
+                    deleteManager();
+                    break;
                 case "Jobs":
                     deleteJob();
                     break;
@@ -305,6 +329,24 @@ function deleteJob() {
         });
 }
 
+function deleteManager() {
+    inquirer.prompt([{
+            name: "managerID",
+            type: "input",
+            message: "Enter the id of the Manager you want to delete:",
+        }, ])
+        .then(function(answer) {
+            console.log(answer)
+            connection.query("DELETE FROM employee WHERE employee.manager_id =? ", [answer.managerID],
+                function(err, res) {
+                    if (err) throw err;
+                    console.log(`Deleted ${answer.managerID} `)
+                    init();
+                }
+            )
+        });
+}
+
 function addEmployee() {
     inquirer.prompt([{
                 name: "firstName",
@@ -337,6 +379,7 @@ function addEmployee() {
                 },
                 function(err, res) {
                     if (err) throw err;
+
                     console.log(`New employee: ${answer.firstName} ${answer.lastName} with Job ID ${answer.jobID} and Manager with an ID of ${answer.managerID}`)
                     init();
                 }
@@ -377,4 +420,5 @@ module.exports = {
     addRecord,
     updateEmployee,
     deleteRecord,
+    viewBudget,
 }
