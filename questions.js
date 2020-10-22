@@ -11,7 +11,8 @@ function init() {
                 "Add a record",
                 "View Records",
                 "Update Employee Roles",
-                "Delete Records"
+                "Delete Records",
+                "Update Employee Managers"
             ]
         })
         .then(function(answer) {
@@ -27,7 +28,9 @@ function init() {
                 case "Update Employee Roles":
                     updateEmployee();
                     break;
-
+                case "Update Employee Managers":
+                    updateManager();
+                    break;
                 case "Delete Records":
                     deleteRecord();
                     break;
@@ -43,6 +46,7 @@ function viewRecords() {
             message: "Which records do you want to view?",
             choices: [
                 "Departments",
+                "Manager",
                 "Jobs",
                 "Employees",
                 "Return to Menu"
@@ -53,7 +57,9 @@ function viewRecords() {
                 case "Departments":
                     findDepartment();
                     break;
-
+                case "Manager":
+                    findManager();
+                    break;
                 case "Jobs":
                     findJob();
                     break;
@@ -137,6 +143,27 @@ function deleteRecord() {
         });
 }
 
+function updateManager() {
+    inquirer.prompt([{
+            name: "id",
+            type: "number",
+            message: "Enter the ID of the employee you want to update",
+        },
+        {
+            name: "managerID",
+            type: "number",
+            message: "Enter the new manager ID number",
+        },
+    ]).then(function(answer) {
+        connection.query("UPDATE employee SET ? WHERE ? ", [{ manager_id: answer.managerID }, { id: answer.id }],
+            function(err, res) {
+                if (err) throw err;
+                console.log(`Employee ID ${answer.id} updated with new Manager ${answer.managerID} `)
+                init();
+            })
+    })
+}
+
 function updateEmployee() {
     inquirer.prompt([{
                 name: "id",
@@ -168,6 +195,14 @@ function findDepartment() {
     });
 }
 
+function findManager() {
+    connection.query("SELECT manager_id, first_name, last_name FROM employee;", function(err, res) {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
 function findJob() {
     connection.query("SELECT job.id, title, salary, name FROM job INNER JOIN department ON department_id = department.id;", function(err, res) {
         if (err) throw err;
@@ -178,7 +213,7 @@ function findJob() {
 
 function findEmployee() {
     console.log("running findEmployee()")
-    connection.query("SELECT employee.id, first_name, last_name, title, salary FROM employee INNER JOIN job ON employee.job_id = job.id;", function(err, res) {
+    connection.query("SELECT employee.id, manager_id, first_name, last_name, title, salary FROM employee INNER JOIN job ON employee.job_id = job.id;", function(err, res) {
         if (err) throw err;
         console.table(res);
         init();

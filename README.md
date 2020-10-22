@@ -74,9 +74,9 @@ Here are some guidelines:
 
 * The command-line application should allow users to:
 
-  * Update employee managers
+  * Update employee managers (Finished)
 
-  * View employees by manager
+  * View employees by manager (Finished)
 
   * Delete departments, roles, and employees (Finished)
 
